@@ -1,36 +1,49 @@
+import axios from 'axios'
 import { createStore } from 'vuex'
+
 export default createStore({
     state:{
          name:"My Task",
-         sec_Time:0,
-         min_Time:0,
-         hr_Time:0,
-         setInter:null
+         myAllTask:null,
+         timeM: 0,
+         timeS: 0,
+         timer: null,
     },
     mutations:{
-    setStart(state){
-        state.setInter = setInterval(()=>{
-           state.sec_Time++
-           if(state.sec_Time==59){
-            state.min_Time++
-            state.sec_Time=0
-           }
-        },1000)
+    setStarTimer(state){
+       if (!state.timer) {
+        state.timer = setInterval(() => {
+            state.timeS += 1;
+            if (state.timeS === 59) {
+                state.timeM += 1
+                state.timeS = 0
+  
+            }
+          }, 1000);
+       }
     },
-    setStop(state){
-        clearInterval(state.setInter)
-    }
-
+setStopTimer(state){
+        if (state.timer) {
+            clearInterval(state.timer);
+            state.timer = null;
+          }
+    },
     },
     actions:{
-    startTimer(context){
-        context.commit('setStart')
+    timerStart(context){
+       context.commit('setStarTimer')   
     },
-    stopTimer(context){
-        context.commit('setStop')
-    }
+    timerStop(context){
+       context.commit('setStopTimer')   
+    },
+   
     },
     getters:{
-        
+    getList(state){
+        return state.myAllTask
+    },
+    timerStatus(state){
+     return `${state.timeM} : ${state.timeS}`
+    }
     }
 })

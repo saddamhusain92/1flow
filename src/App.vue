@@ -2,12 +2,12 @@
   <router-view></router-view>
   <div :class="hiden?'d-none':'d-display'">
     <div class="btn_frame">
-    <span>+</span>
+    <span><CogIcon class="icon-svg" /></span> 
     <span @click="closebtn"><XMarkIcon class="icon-svg" /></span>
   </div>
   <div class="header_wrapper">
     
-    <span class="title"><b>All Tasks</b></span> <span class="total_time"><b>{{  toTime }}</b></span>
+    <span class="title"><b>All Tasks{{ this.$store.state.timeM }} : {{ this.$store.state.timeS }} <button @click="timerStart">start</button></b></span> <span class="total_time"><b>{{  toTime }}</b></span>
     
   </div>
   <div class="todos-app">
@@ -48,8 +48,9 @@
 </template>
 
 <script>
-import { TrashIcon, PauseIcon, PlayIcon, PlusIcon,XMarkIcon } from '@heroicons/vue/24/solid'
+import { TrashIcon, PauseIcon, PlayIcon, PlusIcon,XMarkIcon,CogIcon  } from '@heroicons/vue/24/solid'
 import axios from 'axios'
+import { mapActions } from 'vuex';
 export default {
   name: 'TodosApp',
   components: {
@@ -57,7 +58,8 @@ export default {
     XMarkIcon,
     PlayIcon,
     PauseIcon,
-    PlusIcon
+    PlusIcon,
+    CogIcon 
   },
   data() {
     return {
@@ -72,15 +74,15 @@ export default {
     },
     toTime(){
       let done =  this.todos.filter(o => o.completed == true) 
-      var totalS= 0;
       var totalM= 0;
        for (var i = 0; i < done.length; i++) {
               totalM += done[i].timeM;
-              totalS += done[i].timeS;
-
             }
-      
-     return `Total Time - ${totalM}:${totalS}`
+            var hours = (totalM / 60);
+            var rhours = Math.floor(hours);
+            var minutes = (hours - rhours) * 60;
+            var rminutes = Math.round(minutes);
+     return totalM<60? "0 Hr : "+totalM+" Min":rhours + " Hr : " + rminutes + " Min"
     },
     workStaus() {
       let d = this.todos.length
@@ -88,6 +90,9 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+   timerStart:"timerStart"
+    }),
     getList() {
       axios.get('https://server-oz1f.onrender.com/MyTasks').then(res => this.todos = res.data)
     },
@@ -200,6 +205,9 @@ export default {
   padding: 3px;
   -webkit-app-region: no-drag;
 }
+.work_pro{
+
+}
 .btn_frame span:nth-child(2):hover{
   background-color: red;
   color: #F5F5F5;
@@ -226,10 +234,11 @@ export default {
 .bar_wrapper {
   position: relative;
   height: 18px;
+  left: 0px;
   text-align: center;
   color: #F5F5F5;
   font-size: 10px;
-  padding: 4px;
+  padding-top: 3px;
   background-color: rgb(10, 144, 122);
 }
 
